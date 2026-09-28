@@ -1,4 +1,4 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NameParser;
 using System;
 
@@ -8,10 +8,9 @@ namespace NameParseTest
     public class NameParserTests
     {
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void NullInput()
         {
-            var parsed = new HumanName(null);
+            Assert.ThrowsExactly<ArgumentNullException>(() => new HumanName(null));
         }
 
 

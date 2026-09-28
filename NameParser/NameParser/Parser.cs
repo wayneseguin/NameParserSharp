@@ -1,4 +1,4 @@
-namespace NameParser
+﻿namespace NameParser
 {
     using System;
     using System.Collections.Generic;
@@ -178,22 +178,22 @@ namespace NameParser
         #region  Parse helpers
         private static bool IsTitle(string value)
         {
-            return Titles.Contains(value.ToLower().Replace(".", string.Empty));
+            return Titles.Contains(value.Replace(".", string.Empty));
         }
 
         private static bool IsConjunction(string piece)
         {
-            return Conjunctions.Contains(piece.ToLower().Replace(".", string.Empty)) && !IsAnInitial(piece);
+            return Conjunctions.Contains(piece.Replace(".", string.Empty)) && !IsAnInitial(piece);
         }
 
         private static bool IsPrefix(string piece)
         {
-            return Prefixes.Contains(piece.ToLower().Replace(".", string.Empty)) && !IsAnInitial(piece);
+            return Prefixes.Contains(piece.Replace(".", string.Empty)) && !IsAnInitial(piece);
         }
 
         private static bool IsSuffix(string piece)
         {
-            return Suffixes.Contains(piece.Replace(".", string.Empty).ToLower()) && !IsAnInitial(piece);
+            return Suffixes.Contains(piece.Replace(".", string.Empty)) && !IsAnInitial(piece);
         }
 
         private static bool AreSuffixes(IEnumerable<string> pieces)
@@ -208,7 +208,7 @@ namespace NameParser
         /// <returns>False if <see cref="piece"/> is a prefix (de, abu, bin), suffix (jr, iv, cpa), title (mr, pope), or initial (x, e.); true otherwise</returns>
         private static bool IsRootname(string piece)
         {
-            var lcPiece = piece.ToLower().Replace(".", string.Empty);
+            var lcPiece = piece.Replace(".", string.Empty);
 
             return !Suffixes.Contains(lcPiece)
                 && !Prefixes.Contains(lcPiece)
@@ -242,7 +242,7 @@ namespace NameParser
         private void PostProcessFirstnames()
         {
             if (!string.IsNullOrEmpty(Title)
-                && !FirstNameTitles.Contains(Title.ToLower().Replace(".", string.Empty))
+                && !FirstNameTitles.Contains(Title.Replace(".", string.Empty))
                 && 1 == _FirstList.Count + _LastList.Count)
             {
                 if (_FirstList.Any())
@@ -344,9 +344,9 @@ namespace NameParser
 
                     _FullName = primary;
                 }
-                else if (_FullName.ToLowerInvariant().Contains(" and "))
+                else if (_FullName.IndexOf(" and ", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    var split = _FullName.IndexOf(" and ", StringComparison.InvariantCultureIgnoreCase);
+                    var split = _FullName.IndexOf(" and ", StringComparison.OrdinalIgnoreCase);
 
                     var primary = _FullName.Substring(0, split);
 
@@ -551,6 +551,8 @@ namespace NameParser
             PostProcessAdditionalName();
         }
 
+        private static readonly Regex nicknameRegex = new Regex(@"\s*(?:\((.+?)\))|(?:((?<![a-zA-Z])[""'])(.+?)\2)", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
         private static void ParseNicknames(ref string fullName, out IList<string> nicknameList)
         {
             // this regex is an improvement upon the original in that it adds apostrophes and appropriately captures 
@@ -559,7 +561,7 @@ namespace NameParser
             // @"john (j"" jones", @"samuel (sammy"" samsonite" 
 
             // https://code.google.com/p/python-nameparser/issues/detail?id=33
-            var nicknameRegex = new Regex(@"\s*(?:\((.+?)\))|(?:([""'])(.+?)\2)");
+            
             nicknameList = new List<string>();
 
             var match = nicknameRegex.Match(fullName);
